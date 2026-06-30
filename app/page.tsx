@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getDeals, dealsByStage } from "@/lib/store";
+import { getDeals } from "@/lib/store";
 import { ASSET_LABEL, STAGE_ORDER, type DealStage } from "@/lib/types";
 import { moneyShort } from "@/lib/format";
 
@@ -28,9 +28,9 @@ function Fit({ score }: { score?: number }) {
   return <span className={`font-bold tabular-nums ${c}`}>{score}</span>;
 }
 
-export default function Dashboard() {
-  const deals = getDeals();
-  const outbox = dealsByStage("outbox");
+export default async function Dashboard() {
+  const deals = await getDeals();
+  const outbox = deals.filter((d) => d.stage === "outbox");
   const counts = Object.fromEntries(STAGE_ORDER.map((s) => [s, deals.filter((d) => d.stage === s).length]));
 
   const stats = [

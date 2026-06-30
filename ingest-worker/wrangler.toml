@@ -1,0 +1,12 @@
+name = "zion-deal-ingest"
+main = "src/index.js"
+compatibility_date = "2025-03-01"
+
+# Set after deploy:
+#   wrangler secret put INGEST_SECRET      # same value as the app's INGEST_SECRET
+# And set the app URL:
+[vars]
+INGEST_URL = "https://REPLACE-WITH-YOUR-APP.vercel.app/api/ingest"
+
+# Then in Cloudflare → Email → Email Routing, route deals@zionpropertyacquisitions.com
+# to this Worker (Action: "Send to a Worker").

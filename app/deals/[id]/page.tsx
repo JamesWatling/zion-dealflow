@@ -16,7 +16,7 @@ const STRUCT_LABEL: Record<FinanceStructure, string> = {
 
 export default async function DealPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const d = getDeal(id);
+  const d = await getDeal(id);
   if (!d) notFound();
   const a = d.analysis;
 
