@@ -11,6 +11,7 @@
     "db:push": "node --env-file=.env node_modules/drizzle-kit/bin.cjs push",
     "db:seed": "node --env-file=.env --import tsx scripts/seed.ts",
     "analyze": "node --env-file=.env --import tsx scripts/analyze.ts",
+    "pdf": "node --env-file=.env --import tsx scripts/generate-pdf.ts",
     "source": "node --env-file=.env --import tsx scripts/source.ts"
   },
   "dependencies": {

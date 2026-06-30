@@ -141,7 +141,11 @@ export default async function DealPage({ params }: { params: Promise<{ id: strin
                 <div className="mt-3">
                   <ApproveButton dealId={d.id} status={d.offer.status} sentAt={d.offer.sentAt} />
                 </div>
-                <a className="mt-2 block text-xs text-canyon hover:underline">Attach &amp; preview offer PDF (M4)</a>
+                {d.offer.pdfBase64 ? (
+                  <a href={`/api/offers/${d.id}/pdf`} target="_blank" rel="noreferrer" className="mt-2 block text-xs text-canyon hover:underline">📄 Preview offer PDF</a>
+                ) : (
+                  <span className="mt-2 block text-xs text-ink-soft">PDF not generated — run <code>npm run pdf</code></span>
+                )}
               </>
             ) : (
               <p className="text-sm text-ink-soft">Draft generated after analysis (M4).</p>

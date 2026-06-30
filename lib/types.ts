@@ -93,7 +93,8 @@ export interface Offer {
   recipient?: string;
   subject?: string;
   emailBody?: string;
-  pdfPath?: string;
+  html?: string; // rendered LOI HTML (source for the PDF)
+  pdfBase64?: string; // generated offer PDF, base64 (attached at send time)
   status: OfferStatus;
   approvedAt?: string;
   sentAt?: string;
