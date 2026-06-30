@@ -87,7 +87,7 @@ export interface Analysis {
   generatedAt?: string;
 }
 
-export type OfferStatus = "draft" | "approved" | "sent" | "replied";
+export type OfferStatus = "draft" | "approved" | "sending" | "sent" | "replied";
 
 export interface Offer {
   recipient?: string;

@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { SEED } from "./mock-data";
 import { db, hasDb } from "./db/client";
 import { properties, type PropertyRow } from "./db/schema";
@@ -99,6 +99,25 @@ export async function createProperty(input: Partial<Property> & { name: string }
     mem.unshift(property);
   }
   return property;
+}
+
+// Atomically reserve an offer for sending: draft|approved -> sending.
+// Returns true only for the caller that wins the transition (prevents double-send).
+export async function claimOfferForSend(id: string): Promise<boolean> {
+  if (hasDb && db) {
+    const res = await db
+      .update(properties)
+      .set({ offer: sql`jsonb_set(${properties.offer}, '{status}', '"sending"')`, updatedAt: new Date() })
+      .where(and(eq(properties.id, id), sql`(${properties.offer}->>'status') in ('draft','approved')`))
+      .returning({ id: properties.id });
+    return res.length > 0;
+  }
+  const d = mem.find((x) => x.id === id);
+  if (d?.offer && (d.offer.status === "draft" || d.offer.status === "approved")) {
+    d.offer = { ...d.offer, status: "sending" };
+    return true;
+  }
+  return false;
 }
 
 export async function updateProperty(id: string, patch: Partial<Property>): Promise<void> {

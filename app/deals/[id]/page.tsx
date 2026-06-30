@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getDeal } from "@/lib/store";
 import { ASSET_LABEL, type FinanceStructure } from "@/lib/types";
 import { money, moneyShort, pct } from "@/lib/format";
-import { ApproveButton } from "@/components/approve-button";
+import { OfferPanel } from "@/components/offer-panel";
 
 const STRUCT_LABEL: Record<FinanceStructure, string> = {
   seller_carry: "Seller carry",
@@ -130,25 +130,17 @@ export default async function DealPage({ params }: { params: Promise<{ id: strin
           <section className="rounded-xl border border-line bg-white p-5">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-soft mb-3">Offer email</h2>
             {d.offer ? (
-              <>
-                <div className="text-xs text-ink-soft mb-1">To: {d.offer.recipient || d.contact?.email || "—"}</div>
-                <div className="text-sm font-medium mb-2">{d.offer.subject}</div>
-                <textarea
-                  defaultValue={d.offer.emailBody}
-                  rows={8}
-                  className="w-full rounded-lg border border-line bg-cream p-2 text-xs leading-relaxed focus:outline-2 focus:outline-ember"
-                />
-                <div className="mt-3">
-                  <ApproveButton dealId={d.id} status={d.offer.status} sentAt={d.offer.sentAt} />
-                </div>
-                {d.offer.pdfBase64 ? (
-                  <a href={`/api/offers/${d.id}/pdf`} target="_blank" rel="noreferrer" className="mt-2 block text-xs text-canyon hover:underline">📄 Preview offer PDF</a>
-                ) : (
-                  <span className="mt-2 block text-xs text-ink-soft">PDF not generated — run <code>npm run pdf</code></span>
-                )}
-              </>
+              <OfferPanel
+                dealId={d.id}
+                recipient={d.offer.recipient ?? d.contact?.email}
+                subject={d.offer.subject}
+                emailBody={d.offer.emailBody}
+                status={d.offer.status}
+                sentAt={d.offer.sentAt}
+                hasPdf={Boolean(d.offer.pdfBase64)}
+              />
             ) : (
-              <p className="text-sm text-ink-soft">Draft generated after analysis (M4).</p>
+              <p className="text-sm text-ink-soft">Draft generated after analysis.</p>
             )}
           </section>
         </div>
