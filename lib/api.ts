@@ -49,7 +49,7 @@ export function sanitizeListing(body: unknown): (Partial<Property> & { name?: st
   };
   if (typeof b.assetType === "string" && (ASSET_TYPES as string[]).includes(b.assetType)) out.assetType = b.assetType as AssetType;
   if (typeof b.source === "string" && SOURCES.includes(b.source)) out.source = b.source as Property["source"];
-  if (typeof b.stage === "string" && STAGES.includes(b.stage)) out.stage = b.stage as DealStage;
+  if (typeof b.stage === "string" && (STAGES as string[]).includes(b.stage)) out.stage = b.stage as DealStage;
 
   for (const k of Object.keys(out) as (keyof Property)[]) if (out[k] === undefined) delete out[k];
   if (!out.name && !out.url) return null;
