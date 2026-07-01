@@ -31,6 +31,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       to,
       subject: d.offer.subject,
       text: d.offer.emailBody,
+      pdfUrl: d.offer.pdfUrl,
       pdfBase64: d.offer.pdfBase64,
       filename: `offer-${id}.pdf`,
     });

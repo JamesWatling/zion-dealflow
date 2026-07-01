@@ -94,7 +94,8 @@ export interface Offer {
   subject?: string;
   emailBody?: string;
   html?: string; // rendered LOI HTML (source for the PDF)
-  pdfBase64?: string; // generated offer PDF, base64 (attached at send time)
+  pdfUrl?: string; // offer PDF in Vercel Blob (preferred)
+  pdfBase64?: string; // offer PDF base64 (fallback when Blob isn't configured)
   status: OfferStatus;
   approvedAt?: string;
   sentAt?: string;

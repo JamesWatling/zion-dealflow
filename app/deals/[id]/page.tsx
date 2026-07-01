@@ -137,7 +137,7 @@ export default async function DealPage({ params }: { params: Promise<{ id: strin
                 emailBody={d.offer.emailBody}
                 status={d.offer.status}
                 sentAt={d.offer.sentAt}
-                hasPdf={Boolean(d.offer.pdfBase64)}
+                hasPdf={Boolean(d.offer.pdfBase64 || d.offer.pdfUrl)}
               />
             ) : (
               <p className="text-sm text-ink-soft">Draft generated after analysis.</p>

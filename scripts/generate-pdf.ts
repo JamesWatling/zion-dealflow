@@ -5,6 +5,7 @@ import { getDeals, getDeal, updateProperty } from "../lib/store";
 import { hasDb } from "../lib/db/client";
 import { buildOfferHtml } from "../lib/offer-html";
 import { renderPdf } from "../lib/offer-pdf";
+import { blobEnabled, uploadOfferPdf } from "../lib/blob";
 import type { Property } from "../lib/types";
 
 const arg = (k: string) => process.argv.find((a) => a.startsWith(`--${k}=`))?.split("=")[1];
@@ -13,7 +14,7 @@ const FORCE = process.argv.includes("--force");
 const msg = (e: unknown) => (e instanceof Error ? e.message : String(e));
 
 const MAX_PDF_BYTES = Number(process.env.MAX_PDF_BYTES ?? 5_000_000); // ~5 MB
-const needsPdf = (d: Property) => !!d.offer && (FORCE || !d.offer.pdfBase64);
+const needsPdf = (d: Property) => !!d.offer && (FORCE || (!d.offer.pdfBase64 && !d.offer.pdfUrl));
 
 async function one(d: Property) {
   console.log(`• rendering PDF for ${d.id} — ${d.name}`);
@@ -27,8 +28,14 @@ async function one(d: Property) {
     console.log("  ↷ skipped — offer removed");
     return;
   }
-  await updateProperty(d.id, { offer: { ...current.offer, html, pdfBase64: pdf.toString("base64") } });
-  console.log(`  → ${(pdf.length / 1024).toFixed(0)} KB stored`);
+  if (blobEnabled()) {
+    const url = await uploadOfferPdf(d.id, pdf);
+    await updateProperty(d.id, { offer: { ...current.offer, html, pdfUrl: url, pdfBase64: undefined } });
+    console.log(`  → ${(pdf.length / 1024).toFixed(0)} KB → Blob`);
+  } else {
+    await updateProperty(d.id, { offer: { ...current.offer, html, pdfUrl: undefined, pdfBase64: pdf.toString("base64") } });
+    console.log(`  → ${(pdf.length / 1024).toFixed(0)} KB stored (base64)`);
+  }
 }
 
 async function main() {

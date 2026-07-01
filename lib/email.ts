@@ -10,7 +10,8 @@ export interface SendOpts {
   to: string;
   subject: string;
   text: string;
-  pdfBase64?: string;
+  pdfUrl?: string; // Vercel Blob URL (preferred — Resend fetches it)
+  pdfBase64?: string; // fallback
   filename?: string;
 }
 
@@ -32,7 +33,9 @@ export async function sendOfferEmail(opts: SendOpts): Promise<string> {
     text: opts.text,
     html,
   };
-  if (opts.pdfBase64) {
+  if (opts.pdfUrl) {
+    body.attachments = [{ filename: opts.filename || "offer.pdf", path: opts.pdfUrl }];
+  } else if (opts.pdfBase64) {
     body.attachments = [{ filename: opts.filename || "offer.pdf", content: opts.pdfBase64 }];
   }
 
