@@ -29,8 +29,13 @@ async function hmac(password: string, msg: string): Promise<string> {
     .join("");
 }
 
-export async function sessionToken(): Promise<string> {
-  return hmac(process.env.APP_PASSWORD || "", SALT);
+const MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+// Session cookie = "<issuedAt>.<hmac(password, SALT:issuedAt)>" — carries an
+// expiry and rotates when APP_PASSWORD changes (invalidates old cookies).
+export async function issueSession(): Promise<string> {
+  const ts = Date.now().toString();
+  return `${ts}.${await hmac(process.env.APP_PASSWORD || "", `${SALT}:${ts}`)}`;
 }
 
 export function verifyPassword(input: string): boolean {
@@ -40,5 +45,12 @@ export function verifyPassword(input: string): boolean {
 
 export async function verifySession(cookieValue: string | undefined): Promise<boolean> {
   if (!process.env.APP_PASSWORD || !cookieValue) return false;
-  return ctEqual(cookieValue, await sessionToken());
+  const dot = cookieValue.indexOf(".");
+  if (dot < 1) return false;
+  const ts = cookieValue.slice(0, dot);
+  const sig = cookieValue.slice(dot + 1);
+  const n = Number(ts);
+  // reject non-integers, negatives, expired, and future-issued (beyond small skew)
+  if (!Number.isSafeInteger(n) || n < 0 || Date.now() - n > MAX_AGE_MS || n > Date.now() + 60_000) return false;
+  return ctEqual(sig, await hmac(process.env.APP_PASSWORD || "", `${SALT}:${ts}`));
 }

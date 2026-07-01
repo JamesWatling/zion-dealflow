@@ -99,6 +99,7 @@ export interface Offer {
   approvedAt?: string;
   sentAt?: string;
   resendId?: string;
+  followUps?: number; // number of follow-ups drafted after the first send
 }
 
 export interface Property {

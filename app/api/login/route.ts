@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { SESSION_COOKIE, authEnabled, sessionToken, verifyPassword } from "@/lib/auth";
+import { SESSION_COOKIE, authEnabled, issueSession, verifyPassword } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "invalid password" }, { status: 401 });
   }
   const res = NextResponse.json({ ok: true });
-  res.cookies.set(SESSION_COOKIE, await sessionToken(), {
+  res.cookies.set(SESSION_COOKIE, await issueSession(), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",

@@ -12,7 +12,8 @@
     "db:seed": "node --env-file=.env --import tsx scripts/seed.ts",
     "analyze": "node --env-file=.env --import tsx scripts/analyze.ts",
     "pdf": "node --env-file=.env --import tsx scripts/generate-pdf.ts",
-    "source": "node --env-file=.env --import tsx scripts/source.ts"
+    "source": "node --env-file=.env --import tsx scripts/source.ts",
+    "followup": "node --env-file=.env --import tsx scripts/followup.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",

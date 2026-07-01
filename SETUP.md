@@ -52,10 +52,18 @@ New alerts now appear in the **Sourced** column automatically.
 ## 6. The AI workers (run on your machine — uses Claude Code, not the API)
 These connect to the same `DATABASE_URL` and use `claude -p`:
 ```bash
-npm run source     # M6: run search agents -> queue new candidates  (Sourced)
-npm run analyze    # M3: underwrite un-analyzed deals + draft offers (Analyzed/Drafted)
+npm run source     # discover new / price-cut listings -> queue      (Sourced)
+npm run analyze    # underwrite un-analyzed deals + draft offers      (-> Outbox)
+npm run pdf        # render the offer PDF for drafted offers
+npm run followup   # draft follow-ups for sent offers with no reply   (-> Outbox)
 ```
-Run them on demand, or on a cron on your machine (e.g. `crontab`). They need Claude Code installed + logged in. Set `CLAUDE_BIN` if `claude` isn't on PATH.
+Run on demand, or on your machine's cron. Example daily pass (crontab):
+```
+0 8 * * *  cd /path/to/zion-dealflow && npm run source && npm run analyze && npm run pdf && npm run followup
+```
+They need Claude Code installed + logged in. Set `CLAUDE_BIN` if `claude` isn't on PATH. A separate **Vercel Cron** (`vercel.json` → `/api/cron/screen`, secured by `CRON_SECRET`) re-screens sourced deals against the buy box daily — that one runs on Vercel (no Claude needed).
+
+Auth: set `APP_PASSWORD` to lock the dashboard (login at `/login`; sessions expire after 30 days). Leave it unset only for local dev — production refuses to run without it.
 
 ## 7. Sending offers
 From the dashboard **Outbox**, review/edit an offer and click **Approve & Send** — it sends from your domain via Resend with the PDF attached (`RESEND_API_KEY` required; domain already verified).
