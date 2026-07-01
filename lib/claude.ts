@@ -6,12 +6,14 @@ import { spawn } from "node:child_process";
 export interface ClaudeOpts {
   model?: string;
   timeoutMs?: number;
+  allowedTools?: string[]; // e.g. ["WebSearch","WebFetch"] to let the agent search the web
 }
 
 export function runClaude(prompt: string, opts: ClaudeOpts = {}): Promise<string> {
   const bin = process.env.CLAUDE_BIN || "claude";
   const args = ["-p"];
   if (opts.model) args.push("--model", opts.model);
+  if (opts.allowedTools?.length) args.push("--allowedTools", opts.allowedTools.join(","));
   const timeoutMs = opts.timeoutMs ?? 240000;
 
   return new Promise((resolve, reject) => {

@@ -2,9 +2,16 @@ import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE, authEnabled, verifySession } from "@/lib/auth";
 
 // Public routes: login flow + the ingest webhook (which uses its own shared secret).
-const PUBLIC = ["/login", "/api/login", "/api/logout", "/api/ingest"];
+// /api/ingest and /api/cron use their own secrets (not the session cookie).
+const PUBLIC = ["/login", "/api/login", "/api/logout", "/api/ingest", "/api/cron"];
 
 export async function proxy(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  // Public routes carry their own secrets (cron/ingest) or are the login flow —
+  // checked first so the APP_PASSWORD gate never blocks them.
+  if (PUBLIC.some((p) => pathname === p || pathname.startsWith(p + "/"))) return NextResponse.next();
+
   if (!authEnabled()) {
     // fail closed in production: a missing APP_PASSWORD must not silently open the app
     if (process.env.NODE_ENV === "production") {
@@ -12,9 +19,6 @@ export async function proxy(req: NextRequest) {
     }
     return NextResponse.next(); // dev convenience
   }
-
-  const { pathname } = req.nextUrl;
-  if (PUBLIC.some((p) => pathname === p || pathname.startsWith(p + "/"))) return NextResponse.next();
 
   const ok = await verifySession(req.cookies.get(SESSION_COOKIE)?.value);
   if (ok) return NextResponse.next();
