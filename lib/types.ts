@@ -43,6 +43,14 @@ export const ASSET_LABEL: Record<AssetType, string> = {
   other: "Other",
 };
 
+// Single-family vs commercial split for the dashboard tabs.
+// "house" = single-family; everything else (multifamily, parks, motels, storage, retail…) = commercial.
+export type DealCategory = "single_family" | "commercial";
+
+export function dealCategory(assetType: AssetType): DealCategory {
+  return assetType === "house" ? "single_family" : "commercial";
+}
+
 export type FinanceStructure =
   | "seller_carry"
   | "subject_to"
