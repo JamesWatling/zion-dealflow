@@ -51,6 +51,22 @@ export default async function DealPage({ params }: { params: Promise<{ id: strin
         <div className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">⚠ {d.notes}</div>
       )}
 
+      {d.docs && d.docs.length > 0 && (
+        <div className="mb-6 flex flex-wrap gap-2">
+          {d.docs.map((doc) => (
+            <a
+              key={doc.url}
+              href={doc.url}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-canyon/40 bg-canyon/5 px-3.5 py-2 text-sm font-semibold text-canyon hover:bg-canyon hover:text-white transition"
+            >
+              📄 {doc.label} <span aria-hidden>↗</span>
+            </a>
+          ))}
+        </div>
+      )}
+
       <div className="grid lg:grid-cols-[1fr_340px] gap-6 items-start">
         {/* analysis */}
         <div className="space-y-6">

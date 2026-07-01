@@ -136,4 +136,6 @@ export interface Property {
   offer?: Offer;
   createdAt: string;
   notes?: string;
+  // Hosted deal documents (served from /public/reports/...). Shown as links on the deal page.
+  docs?: { label: string; url: string }[];
 }
