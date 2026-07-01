@@ -29,6 +29,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   try {
     const resendId = await sendOfferEmail({
       to,
+      dealId: id,
       subject: d.offer.subject,
       text: d.offer.emailBody,
       pdfUrl: d.offer.pdfUrl,

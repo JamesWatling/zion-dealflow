@@ -2,8 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE, authEnabled, verifySession } from "@/lib/auth";
 
 // Public routes: login flow + the ingest webhook (which uses its own shared secret).
-// /api/ingest and /api/cron use their own secrets (not the session cookie).
-const PUBLIC = ["/login", "/api/login", "/api/logout", "/api/ingest", "/api/cron"];
+// These use their own secrets / signatures (not the session cookie).
+const PUBLIC = ["/login", "/api/login", "/api/logout", "/api/ingest", "/api/cron", "/api/reply", "/api/webhooks"];
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;

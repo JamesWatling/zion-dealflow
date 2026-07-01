@@ -101,6 +101,38 @@ export async function createProperty(input: Partial<Property> & { name: string }
   return property;
 }
 
+// Mark a deal replied — atomic transition from "sent" only (idempotent on repeats/races).
+export async function markReplied(id: string): Promise<boolean> {
+  if (hasDb && db) {
+    const res = await db
+      .update(properties)
+      .set({ stage: "replied", offer: sql`jsonb_set(${properties.offer}, '{status}', '"replied"')`, updatedAt: new Date() })
+      .where(and(eq(properties.id, id), eq(properties.stage, "sent")))
+      .returning({ id: properties.id });
+    return res.length > 0;
+  }
+  const d = mem.find((x) => x.id === id);
+  if (d && d.stage === "sent") {
+    d.stage = "replied";
+    if (d.offer) d.offer = { ...d.offer, status: "replied" };
+    return true;
+  }
+  return false;
+}
+
+// Find a deal by the Resend message id recorded on its offer (for delivery webhooks).
+export async function getDealByResendId(resendId: string): Promise<Property | undefined> {
+  if (hasDb && db) {
+    const rows = await db
+      .select()
+      .from(properties)
+      .where(sql`(${properties.offer}->>'resendId') = ${resendId}`)
+      .limit(1);
+    return rows[0] ? rowToProperty(rows[0]) : undefined;
+  }
+  return mem.find((d) => d.offer?.resendId === resendId);
+}
+
 // Atomically reserve an offer for sending: draft|approved -> sending.
 // Returns true only for the caller that wins the transition (prevents double-send).
 export async function claimOfferForSend(id: string): Promise<boolean> {

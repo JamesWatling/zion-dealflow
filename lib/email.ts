@@ -10,6 +10,7 @@ export interface SendOpts {
   to: string;
   subject: string;
   text: string;
+  dealId?: string; // tags reply-to as reply+<id>@ so the Cloudflare worker can attribute replies
   pdfUrl?: string; // Vercel Blob URL (preferred — Resend fetches it)
   pdfBase64?: string; // fallback
   filename?: string;
@@ -25,10 +26,13 @@ export async function sendOfferEmail(opts: SendOpts): Promise<string> {
     .map((l) => esc(l))
     .join("<br>")}</div>`;
 
+  const domain = b.email.split("@")[1] || "zionpropertyacquisitions.com";
+  const replyTo = opts.dealId ? `reply+${opts.dealId}@${domain}` : b.email;
+
   const body: Record<string, unknown> = {
     from: `${b.name} <${b.email}>`,
     to: [opts.to],
-    reply_to: b.email,
+    reply_to: replyTo,
     subject: opts.subject,
     text: opts.text,
     html,

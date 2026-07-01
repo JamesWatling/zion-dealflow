@@ -1,0 +1,13 @@
+name = "zion-deal-reply"
+main = "src/index.js"
+compatibility_date = "2025-03-01"
+
+# Set after deploy:
+#   wrangler secret put INGEST_SECRET      # same value as the app's INGEST_SECRET
+[vars]
+REPLY_URL = "https://REPLACE-WITH-YOUR-APP.vercel.app/api/reply"
+FORWARD_TO = "watling.james@gmail.com"
+
+# Then in Cloudflare → Email → Email Routing:
+#   - keep info@ routing to your inbox (specific rule, takes precedence)
+#   - set the CATCH-ALL action to "Send to a Worker" → this worker
